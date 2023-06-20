@@ -32,6 +32,7 @@ export default class ddMaker {
             showPlusItemCounter:true,
             enableAutoFilter:true,
             showFilterAlways:false,
+            showFilterWithList:false,
             filterPlaceholder:'',
             showListCounter:false,
             imagePosition:'left',
@@ -121,6 +122,10 @@ export default class ddMaker {
         this._showHideOriginal(false);
 
 
+        if(this._settings.showFilterWithList.toString() === "true") {
+            this._settings.showFilterAlways = false;
+        }
+
         if(this._settings.showFilterAlways.toString() === "true") {
             this._settings.enableAutoFilter = true;
             this._showHideFilterBox(true);
@@ -175,6 +180,7 @@ export default class ddMaker {
         settings.showPlusItemCounter = dataSet?.showPlusItemCounter || settings.showPlusItemCounter;
         settings.errorMessage = dataSet?.errorMessage || settings.errorMessage;
         settings.showFilterAlways = dataSet?.showFilterAlways || settings.showFilterAlways;
+        settings.showFilterWithList = dataSet?.showFilterWithList || settings.showFilterWithList;
         settings.filterPlaceholder = dataSet?.filterPlaceholder || settings.filterPlaceholder;
         settings.showListCounter = dataSet?.showListCounter || settings.showListCounter;
         settings.imagePosition = dataSet?.imagePosition || settings.imagePosition;
@@ -570,15 +576,19 @@ export default class ddMaker {
 
         //Make header
         let divHeader = this._makeHeader();
+        wrapper.appendChild(divHeader);
 
         //Filter box
         let filterBox = this._makeFilterBox();
-        divHeader.appendChild(filterBox);
+        if(this._settings.showFilterWithList.toString() === "true") {
+            wrapper.appendChild(filterBox);
+        } else {
+            divHeader.appendChild(filterBox);
+        }
         this._showHideFilterBox(false);
 
         //make options
         let ul = this._makeChildren();
-        wrapper.appendChild(divHeader);
         wrapper.appendChild(ul);
 
         this._wrapper.holder = wrapper;
@@ -1628,6 +1638,9 @@ export default class ddMaker {
         if(!this._isOpen) {
             this._isOpen = true;
             this._show(this._wrapper.listOfItems);
+            if (this._settings.showFilterWithList.toString() === "true") {
+                this._show(this._wrapper.filterHolder);
+            }
 
             //don't bind event if just opening - useful when making as list
             if(justOpen === false) {
@@ -1665,6 +1678,10 @@ export default class ddMaker {
         }
         this._scrollToIfNeeded(null, 0);
         this._hide(this._wrapper.listOfItems);
+        if (this._settings.showFilterWithList.toString() === "true") {
+            this._hide(this._wrapper.filterHolder);
+        }
+
         this._wrapper.arrow.classList.add(this._css.arrowDown);
         this._wrapper.arrow.classList.remove(this._css.arrowUp);
 
