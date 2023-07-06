@@ -43,7 +43,10 @@ export default class ddMaker {
         //merge with data settings
         this._settings = {...defaultSettings, ...settings};
         this._css = {};
-        this._onDocumentClick = null; this._onDocumentKeyDown = null; this._onDocumentKeyUp = null;
+        this._onDocumentMouseUp = null;
+        this._onDocumentMouseDown = null;
+        this._onDocumentKeyDown = null;
+        this._onDocumentKeyUp = null;
         this._isOpen = false;
         this._DOWN_ARROW = 40; this._UP_ARROW = 38; this._LEFT_ARROW=37; this._RIGHT_ARROW=39;
         this._ESCAPE = 27; this._ENTER = 13; this._ALPHABETS_START = 47; this._SHIFT=16;
@@ -1266,14 +1269,17 @@ export default class ddMaker {
 
         this._unbindDocumentEvents();
 
-        this._onDocumentClick = (evt) => {
-            //is outside?
+        this._onDocumentMouseDown = (evt) => {
             let box = this._wrapper.listOfItems.getBoundingClientRect();
             let headerBox = this._wrapper.header.getBoundingClientRect();
             let areaX = box.left + box.width;
             let areaY = (headerBox.top + box.height+headerBox.height);
 
-            if(evt.clientX < box.left || evt.clientX > areaX || evt.clientY < headerBox.y || evt.clientY > areaY) {
+            this._isMouseDownOutside = evt.clientX < box.left || evt.clientX > areaX || evt.clientY < headerBox.y || evt.clientY > areaY;
+        };
+
+        this._onDocumentMouseUp = (evt) => {
+            if (this._isMouseDownOutside) {
                 this.close(evt);
             }
         };
@@ -1330,7 +1336,8 @@ export default class ddMaker {
         };
 
         if(documentClick === true) {
-            this._bindEvents(document, "mouseup", this._onDocumentClick);
+            this._bindEvents(document, "mousedown", this._onDocumentMouseDown);
+            this._bindEvents(document, "mouseup", this._onDocumentMouseUp);
         }
 
         if(documentKeyDown === true) {
@@ -1347,8 +1354,11 @@ export default class ddMaker {
      */
     _unbindDocumentEvents() {
         //remove events
-        if(this._onDocumentClick !== null) {
-            this._unbindEvents(document, "mouseup", this._onDocumentClick);
+        if(this._onDocumentMouseDown !== null) {
+            this._unbindEvents(document, "mousedown", this._onDocumentMouseDown);
+        }
+        if(this._onDocumentMouseUp !== null) {
+            this._unbindEvents(document, "mouseup", this._onDocumentMouseUp);
         }
         if(this._onDocumentKeyDown !== null) {
             this._unbindEvents(document, "keydown", this._onDocumentKeyDown);
@@ -1358,7 +1368,8 @@ export default class ddMaker {
         }
 
 
-        this._onDocumentClick = null;
+        this._onDocumentMouseDown = null;
+        this._onDocumentMouseUp = null;
         this._onDocumentKeyDown = null;
         this._onDocumentKeyUp = null;
     }
