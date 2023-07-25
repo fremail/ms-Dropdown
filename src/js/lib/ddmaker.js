@@ -1270,10 +1270,14 @@ export default class ddMaker {
         this._unbindDocumentEvents();
 
         this._onDocumentMouseDown = (evt) => {
-            let box = this._wrapper.listOfItems.getBoundingClientRect();
-            let headerBox = this._wrapper.header.getBoundingClientRect();
-            let areaX = box.left + box.width;
-            let areaY = (headerBox.top + box.height+headerBox.height);
+            const box = this._wrapper.listOfItems.getBoundingClientRect();
+            const headerBox = this._wrapper.header.getBoundingClientRect();
+            const areaX = box.left + box.width;
+            let areaY = headerBox.top + box.height + headerBox.height;
+            if (this._settings.showFilterWithList) {
+                const filterBox = this._wrapper.filterHolder.getBoundingClientRect();
+                areaY += filterBox.height;
+            }
 
             this._isMouseDownOutside = evt.clientX < box.left || evt.clientX > areaX || evt.clientY < headerBox.y || evt.clientY > areaY;
         };
